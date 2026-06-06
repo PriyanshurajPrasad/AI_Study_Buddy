@@ -67,24 +67,17 @@ const generateQuizFromNote = async (req, res, next) => {
   try {
     const { noteId } = req.params;
 
-    console.log("NOTE ID:", noteId);
-
     // Validate note belongs to user
     const note = await Note.findOne({ _id: noteId, userId: req.user.id });
     if (!note) {
-      console.log("NOTE FOUND:", !!note);
       return res.status(404).json({
         success: false,
         message: 'Note not found'
       });
     }
 
-    console.log("NOTE FOUND:", !!note);
-    console.log("EXTRACTED TEXT LENGTH:", note?.extractedText?.length);
-
     // Check if note has extracted text
     if (!note.extractedText || note.extractedText.trim().length < 1000) {
-      console.log("EXTRACTED TEXT MISSING OR TOO SHORT");
       return res.status(400).json({
         success: false,
         message: 'PDF text extraction failed. Please upload a readable PDF.'
@@ -107,11 +100,10 @@ const generateQuizFromNote = async (req, res, next) => {
       // Estimate chunks (6000 chars per chunk)
       chunksCount = Math.ceil(Math.min(cleanTextLength, 18000) / 6000);
     } catch (aiError) {
-      console.error('AI quiz generation failed:', aiError.message);
       cleanTextLength = note.extractedText.replace(/\s+/g, " ").trim().length;
       chunksCount = Math.ceil(Math.min(cleanTextLength, 18000) / 6000);
       parseError = aiError;
-      
+
       const debugData = {
         noteId,
         noteFound: !!note,
@@ -124,17 +116,13 @@ const generateQuizFromNote = async (req, res, next) => {
         validCount: 0,
         validationErrors
       };
-      
-      console.log("QUIZ DEBUG:", debugData);
-      
+
       return res.status(422).json({
         success: false,
         message: "Quiz generation failed",
         debug: debugData
       });
     }
-
-    console.log("GENERATED QUESTIONS COUNT:", generatedCount);
 
     // Validate questions before creating quiz
     if (!quizData.questions || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
@@ -150,9 +138,7 @@ const generateQuizFromNote = async (req, res, next) => {
         validCount: 0,
         validationErrors
       };
-      
-      console.log("QUIZ DEBUG:", debugData);
-      
+
       return res.status(422).json({
         success: false,
         message: 'AI could not generate valid quiz JSON. Please try again.',
@@ -164,13 +150,11 @@ const generateQuizFromNote = async (req, res, next) => {
     const invalidQuestions = quizData.questions.filter((q, index) => {
       // Check for placeholder questions
       if (q.question && q.question.toLowerCase().startsWith('question')) {
-        console.log(`Invalid placeholder question at index ${index}:`, q.question);
         return true;
       }
       
       // Check question length
       if (!q.question || q.question.length < 20) {
-        console.log(`Question too short at index ${index}:`, q.question?.length);
         return true;
       }
 
@@ -181,31 +165,26 @@ const generateQuizFromNote = async (req, res, next) => {
       } else if (typeof q.options === 'object' && q.options !== null) {
         optionsArray = Object.values(q.options);
       } else {
-        console.log(`Invalid options format at index ${index}`);
         return true;
       }
 
       if (!optionsArray || optionsArray.length !== 4) {
-        console.log(`Invalid options count at index ${index}:`, optionsArray?.length);
         return true;
       }
 
       // Check each option length (allow short math options like "20", "40 km/h", "x = 5")
       const hasInvalidOptions = optionsArray.some(opt => !opt || opt.trim().length < 2);
       if (hasInvalidOptions) {
-        console.log(`Has invalid options at index ${index}`);
         return true;
       }
 
       // Check correct answer
       if (!q.correctAnswer || !['A', 'B', 'C', 'D'].includes(q.correctAnswer.toUpperCase())) {
-        console.log(`Invalid correct answer at index ${index}:`, q.correctAnswer);
         return true;
       }
 
       // Check explanation
       if (!q.explanation || q.explanation.length < 5) {
-        console.log(`Missing or short explanation at index ${index}`);
         return true;
       }
 
@@ -213,12 +192,9 @@ const generateQuizFromNote = async (req, res, next) => {
     });
 
     const validCount = quizData.questions.length - invalidQuestions.length;
-    console.log(`VALID QUESTIONS: ${validCount} out of ${quizData.questions.length}`);
 
     // If all questions are invalid, return 422
     if (validCount === 0) {
-      console.log("NO VALID QUESTIONS AFTER FILTERING");
-      
       const debugData = {
         noteId,
         noteFound: !!note,
@@ -231,9 +207,7 @@ const generateQuizFromNote = async (req, res, next) => {
         validCount,
         validationErrors
       };
-      
-      console.log("QUIZ DEBUG:", debugData);
-      
+
       return res.status(422).json({
         success: false,
         message: "AI could not generate valid quiz JSON. Please try again.",
@@ -255,17 +229,13 @@ const generateQuizFromNote = async (req, res, next) => {
         validCount,
         validationErrors
       };
-      
-      console.log("QUIZ DEBUG:", debugData);
-      
+
       return res.status(422).json({
         success: false,
         message: "AI could not generate valid questions from this PDF.",
         debug: debugData
       });
     }
-    
-    console.log(`Proceeding with ${validCount} valid questions`);
 
     // Filter to only valid questions
     const validQuestions = quizData.questions.filter((q, index) => !invalidQuestions.includes(index));
@@ -289,16 +259,11 @@ const generateQuizFromNote = async (req, res, next) => {
 
     // Validate created quiz has questions
     if (!quiz.questions || quiz.questions.length === 0) {
-      console.log("QUESTIONS MISSING AFTER DATABASE SAVE");
       return res.status(500).json({
         success: false,
         message: 'Quiz created but questions are missing from database',
       });
     }
-
-    console.log('BACKEND: Sending quiz response with', quiz.questions.length, 'questions');
-    console.log('BACKEND: Quiz title:', quiz.title);
-    console.log('BACKEND: First question sample:', quiz.questions[0]);
 
     // Convert array options to object format for response
     const questionsWithObjectOptions = quiz.questions.map(q => ({
@@ -323,7 +288,6 @@ const generateQuizFromNote = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error generating quiz from note:', error);
     return res.status(500).json({
       success: false,
       message: error.message || 'Failed to generate quiz. Please try again.',
@@ -340,14 +304,7 @@ const submitQuiz = async (req, res, next) => {
   try {
     const { quizId, answers } = req.body;
 
-    console.log('=== QUIZ SUBMISSION START ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Quiz ID:', quizId);
-    console.log('Answers Count:', answers?.length || 0);
-
     if (!quizId || !answers || !Array.isArray(answers)) {
-      console.error('❌ Missing required fields');
       return res.status(400).json({
         success: false,
         message: 'Please provide quiz ID and answers array',
@@ -409,14 +366,6 @@ const submitQuiz = async (req, res, next) => {
       completedAt: new Date(),
     });
 
-    console.log('✅ Quiz result saved successfully to MongoDB');
-    console.log('   Result ID:', quizResult._id);
-    console.log('   User ID:', quizResult.userId);
-    console.log('   Subject:', quizResult.subject);
-    console.log('   Topic:', quizResult.topic);
-    console.log('   Score:', quizResult.score, '/', quizResult.totalQuestions);
-    console.log('   Percentage:', quizResult.percentage + '%');
-
     res.status(200).json({
       success: true,
       message: 'Quiz submitted successfully',
@@ -429,7 +378,6 @@ const submitQuiz = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('❌ Error submitting quiz:', error);
     next(error);
   }
 };
@@ -482,8 +430,6 @@ const generateQuizFromTopicController = async (req, res, next) => {
   try {
     const { subject, topic, questionCount, difficulty = 'Mixed' } = req.body;
 
-    console.log("TOPIC QUIZ REQUEST:", { subject, topic, questionCount, difficulty });
-
     // Validate required fields
     if (!subject || !topic || !questionCount) {
       return res.status(400).json({
@@ -510,9 +456,8 @@ const generateQuizFromTopicController = async (req, res, next) => {
       quizData = await generateQuizFromTopic(subject, topic, questionCount, difficulty);
       generatedCount = quizData?.questions?.length || 0;
     } catch (aiError) {
-      console.error('AI quiz generation failed:', aiError.message);
       parseError = aiError;
-      
+
       return res.status(422).json({
         success: false,
         message: "Quiz generation failed",
@@ -523,8 +468,6 @@ const generateQuizFromTopicController = async (req, res, next) => {
         }
       });
     }
-
-    console.log("GENERATED QUESTIONS COUNT:", generatedCount);
 
     // Validate questions before creating quiz
     if (!quizData.questions || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
@@ -544,13 +487,11 @@ const generateQuizFromTopicController = async (req, res, next) => {
     const invalidQuestions = quizData.questions.filter((q, index) => {
       // Check for placeholder questions
       if (q.question && q.question.toLowerCase().startsWith('question')) {
-        console.log(`Invalid placeholder question at index ${index}:`, q.question);
         return true;
       }
       
       // Check question length
       if (!q.question || q.question.length < 20) {
-        console.log(`Question too short at index ${index}:`, q.question?.length);
         return true;
       }
 
@@ -561,31 +502,26 @@ const generateQuizFromTopicController = async (req, res, next) => {
       } else if (typeof q.options === 'object' && q.options !== null) {
         optionsArray = Object.values(q.options);
       } else {
-        console.log(`Invalid options format at index ${index}`);
         return true;
       }
 
       if (!optionsArray || optionsArray.length !== 4) {
-        console.log(`Invalid options count at index ${index}:`, optionsArray?.length);
         return true;
       }
 
       // Check each option length (allow short math options like "20", "40 km/h", "x = 5")
       const hasInvalidOptions = optionsArray.some(opt => !opt || opt.trim().length < 2);
       if (hasInvalidOptions) {
-        console.log(`Has invalid options at index ${index}`);
         return true;
       }
 
       // Check correct answer
       if (!q.correctAnswer || !['A', 'B', 'C', 'D'].includes(q.correctAnswer.toUpperCase())) {
-        console.log(`Invalid correct answer at index ${index}:`, q.correctAnswer);
         return true;
       }
 
       // Check explanation
       if (!q.explanation || q.explanation.length < 5) {
-        console.log(`Missing or short explanation at index ${index}`);
         return true;
       }
 
@@ -593,7 +529,6 @@ const generateQuizFromTopicController = async (req, res, next) => {
     });
 
     const validCount = quizData.questions.length - invalidQuestions.length;
-    console.log(`VALID QUESTIONS: ${validCount} out of ${quizData.questions.length}`);
 
     // Only fail if we have NO valid questions at all
     if (validCount === 0) {
@@ -608,8 +543,6 @@ const generateQuizFromTopicController = async (req, res, next) => {
         }
       });
     }
-    
-    console.log(`Proceeding with ${validCount} valid questions`);
 
     // Filter to only valid questions
     const validQuestions = quizData.questions.filter((q, index) => !invalidQuestions.includes(index));
@@ -635,16 +568,11 @@ const generateQuizFromTopicController = async (req, res, next) => {
 
     // Validate created quiz has questions
     if (!quiz.questions || quiz.questions.length === 0) {
-      console.log("QUESTIONS MISSING AFTER DATABASE SAVE");
       return res.status(500).json({
         success: false,
         message: 'Quiz created but questions are missing from database',
       });
     }
-
-    console.log('BACKEND: Sending quiz response with', quiz.questions.length, 'questions');
-    console.log('BACKEND: Quiz title:', quiz.title);
-    console.log('BACKEND: First question sample:', quiz.questions[0]);
 
     // Convert array options to object format for response
     const questionsWithObjectOptions = quiz.questions.map(q => ({
@@ -670,7 +598,6 @@ const generateQuizFromTopicController = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error generating quiz from topic:', error);
     return res.status(500).json({
       success: false,
       message: error.message || 'Failed to generate quiz. Please try again.',
@@ -687,9 +614,6 @@ const getQuizResultById = async (req, res, next) => {
   try {
     const { resultId } = req.params;
 
-    console.log("Fetching quiz result by ID:", resultId);
-    console.log("User ID:", req.user.id);
-
     const quizResult = await QuizResult.findOne({
       _id: resultId,
       userId: req.user.id,
@@ -701,8 +625,6 @@ const getQuizResultById = async (req, res, next) => {
         message: 'Quiz result not found',
       });
     }
-
-    console.log("Quiz result found:", quizResult._id);
 
     res.status(200).json({
       success: true,
@@ -723,7 +645,6 @@ const getQuizResultById = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching quiz result:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch quiz result',

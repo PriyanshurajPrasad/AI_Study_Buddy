@@ -27,14 +27,11 @@ const SubjectStatistics = () => {
     try {
       setLoading(true);
       const res = await api.get('/progress/subject-statistics');
-      console.log('Subject Statistics API response:', res.data);
       
       if (res.data.success && res.data.stats) {
         setStats(res.data.stats);
-        console.log('Subject statistics loaded:', res.data.stats);
       }
     } catch (error) {
-      console.error('Error loading subject statistics:', error);
       toast.error('Failed to load subject statistics');
       setStats(null);
     } finally {

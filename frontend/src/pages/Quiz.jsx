@@ -49,26 +49,18 @@ const Quiz = () => {
       difficulty
     };
 
-    console.log("TOPIC QUIZ REQUEST:", payload);
-
     setGeneratingQuiz(true);
     toast.loading(`Generating ${questionCount} questions...`, { id: 'quiz-generation' });
     
     try {
       const response = await generateTopicQuiz(payload);
-      console.log("TOPIC QUIZ RESPONSE:", response);
 
       const quiz = response.quiz;
 
       if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
         toast.error("No questions generated.");
-        console.error("Invalid quiz payload:", response);
         return;
       }
-
-      console.log("QUIZ FOR NAVIGATION:", quiz);
-      console.log("QUESTIONS COUNT:", quiz.questions.length);
-      console.log("SAMPLE QUESTION:", quiz.questions[0]);
 
       toast.dismiss('quiz-generation');
       toast.success(`Quiz generated successfully with ${quiz.questions.length} questions.`);
@@ -79,13 +71,7 @@ const Quiz = () => {
       });
       
     } catch (error) {
-      console.error('Quiz generation error:', error);
       toast.dismiss('quiz-generation');
-      
-      // Log full error response for debugging
-      console.log("FULL ERROR RESPONSE:", error.response?.data);
-      console.log("STATUS:", error.response?.status);
-      console.log("MESSAGE:", error.response?.data?.message);
       
       toast.error(error.response?.data?.message || "Failed to generate quiz");
     } finally {

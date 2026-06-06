@@ -41,7 +41,6 @@ const NoteViewer = ({ isOpen, bookmark, onClose }) => {
         setContent({ type: 'unsupported', url: fileUrl });
       }
     } catch (err) {
-      console.error('Error loading content:', err);
       setError('Failed to load note content');
       toast.error('Failed to load note content');
     } finally {

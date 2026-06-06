@@ -13,8 +13,6 @@ export const createQuiz = async (quizData) => {
  */
 export const generateQuizFromNote = async (noteId) => {
   const response = await api.post(`/quiz/generate/${noteId}`);
-  console.log("API RESPONSE:", response);
-  console.log("API RESPONSE DATA:", response.data);
   return response.data;
 };
 
@@ -23,8 +21,6 @@ export const generateQuizFromNote = async (noteId) => {
  */
 export const generateQuizFromTopic = async (quizData) => {
   const response = await api.post('/quiz/generate-topic', quizData);
-  console.log("TOPIC QUIZ API RESPONSE:", response);
-  console.log("TOPIC QUIZ API RESPONSE DATA:", response.data);
   return response.data;
 };
 

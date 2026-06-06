@@ -10,11 +10,6 @@ const uploadBookmark = async (req, res, next) => {
   try {
     const { title, description, subject, tags } = req.body;
 
-    console.log('=== BOOKMARK UPLOAD START ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Bookmark data:', { title, description, subject, tags });
-
     // Validate required fields
     if (!title || !req.file) {
       return res.status(400).json({
@@ -60,12 +55,6 @@ const uploadBookmark = async (req, res, next) => {
       fileSize: req.file.size
     });
 
-    console.log('✅ Bookmark note saved successfully to MongoDB');
-    console.log('   Bookmark ID:', bookmarkNote._id);
-    console.log('   User ID:', bookmarkNote.userId);
-    console.log('   File Name:', bookmarkNote.fileName);
-    console.log('   File Size:', bookmarkNote.fileSize, 'bytes');
-
     // Construct file URL for frontend
     const fileUrl = `${req.protocol}://${req.get('host')}/uploads/bookmarks/${req.file.filename}`;
 
@@ -78,7 +67,7 @@ const uploadBookmark = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error uploading bookmark:', error);
+    console.error('Error uploading bookmark:', error.message);
     next(error);
   }
 };
@@ -90,11 +79,6 @@ const uploadBookmark = async (req, res, next) => {
 const getBookmarks = async (req, res, next) => {
   try {
     const { search, fileType, sort } = req.query;
-
-    console.log('=== FETCHING BOOKMARKS FROM MONGODB ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Filters:', { search, fileType, sort });
 
     // Build query
     const query = { userId: req.user.id };
@@ -134,7 +118,6 @@ const getBookmarks = async (req, res, next) => {
       count: bookmarksWithUrls.length
     });
   } catch (error) {
-    console.error('❌ Error fetching bookmarks from MongoDB:', error);
     next(error);
   }
 };
@@ -168,7 +151,6 @@ const getBookmarkById = async (req, res, next) => {
       data: bookmarkWithUrl
     });
   } catch (error) {
-    console.error('Error fetching bookmark:', error);
     next(error);
   }
 };
@@ -204,13 +186,9 @@ const getBookmarkFile = async (req, res, next) => {
       res.setHeader('Content-Type', 'application/pdf');
     }
 
-    console.log('Serving file:', bookmark.filePath);
-    console.log('File type:', bookmark.fileType);
-
     // Send file
     res.sendFile(bookmark.filePath, (err) => {
       if (err) {
-        console.error('Error sending file:', err);
         return res.status(500).json({
           success: false,
           message: 'Error sending file'
@@ -218,7 +196,6 @@ const getBookmarkFile = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching bookmark file:', error);
     next(error);
   }
 };
@@ -244,20 +221,16 @@ const deleteBookmark = async (req, res, next) => {
     // Delete file from filesystem
     if (fs.existsSync(bookmark.filePath)) {
       fs.unlinkSync(bookmark.filePath);
-      console.log('File deleted:', bookmark.filePath);
     }
 
     // Delete from database
     await BookmarkNote.findByIdAndDelete(req.params.id);
-
-    console.log('Bookmark deleted:', req.params.id);
 
     return res.status(200).json({
       success: true,
       message: 'Bookmark deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting bookmark:', error);
     next(error);
   }
 };

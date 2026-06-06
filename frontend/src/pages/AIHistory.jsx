@@ -34,17 +34,14 @@ const AIHistory = () => {
   const loadHistory = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Loading AI history from MongoDB');
       const result = await getAIHistory({ 
         limit: 100,
         type: typeFilter !== 'all' ? typeFilter : undefined,
         search: searchQuery || undefined
       });
-      console.log('AI history loaded from MongoDB:', result.data?.length, 'entries');
       setHistory(result.data || []);
       setError(null);
     } catch (error) {
-      console.error('Error loading history from MongoDB:', error);
       setError('Failed to load history');
       setHistory([]);
     } finally {
@@ -71,12 +68,10 @@ const AIHistory = () => {
   // Delete single history item from MongoDB
   const handleDeleteItem = async (id) => {
     try {
-      console.log('Deleting AI history item from MongoDB:', id);
       await deleteAIHistory(id);
-      toast.success('History deleted from MongoDB');
+      toast.success('History deleted');
       loadHistory();
     } catch (error) {
-      console.error('Error deleting history:', error);
       toast.error('Failed to delete history');
     }
   };
@@ -84,12 +79,10 @@ const AIHistory = () => {
   // Clear all history from MongoDB
   const handleClearAll = async () => {
     try {
-      console.log('Clearing all AI history from MongoDB');
       await clearAIHistory();
-      toast.success('All history cleared from MongoDB');
+      toast.success('All history cleared');
       loadHistory();
     } catch (error) {
-      console.error('Error clearing history:', error);
       toast.error('Failed to clear history');
     }
     setShowDeleteConfirm(false);

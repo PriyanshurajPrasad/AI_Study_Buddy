@@ -85,17 +85,11 @@ const Profile = () => {
     try {
       setAnalyticsLoading(true);
       const res = await api.get('/profile/analytics');
-      console.log('PROFILE ANALYTICS:', res.data);
       
       if (res.data.success && res.data.analytics) {
-        console.log('Analytics loaded successfully:', res.data.analytics);
-        console.log('Weekly Performance:', res.data.analytics.weeklyPerformance);
-        console.log('Topic Progress:', res.data.analytics.topicProgress);
-        console.log('Quiz Performance:', res.data.analytics.quizPerformance);
         setAnalytics(res.data.analytics);
       }
     } catch (error) {
-      console.error('Error fetching profile analytics:', error);
       // If no analytics available, set empty analytics
       setAnalytics({
         weeklyPerformance: [

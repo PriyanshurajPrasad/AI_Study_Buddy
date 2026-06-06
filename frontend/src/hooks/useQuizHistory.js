@@ -10,16 +10,13 @@ export const useQuizHistory = () => {
   const fetchQuizHistory = async () => {
     try {
       setLoading(true);
-      console.log('Fetching quiz history from MongoDB');
       const response = await getQuizHistory();
-      console.log('Quiz history fetched from MongoDB:', response);
       if (response.success) {
         setQuizzes(response.data.quizzes);
       }
     } catch (error) {
-      console.error('Error fetching quiz history from MongoDB:', error);
       setError(error.message);
-      toast.error('Failed to fetch quiz history from MongoDB');
+      toast.error('Failed to fetch quiz history');
       setQuizzes([]); // Use empty array instead of fallback data
     } finally {
       setLoading(false);

@@ -22,29 +22,20 @@ const Bookmarks = () => {
   const getPdfUrl = (note) => {
     const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
     
-    console.log("=== PDF URL CONSTRUCTION ===");
-    console.log("Note:", note);
-    console.log("API_BASE:", API_BASE);
-    
     if (note.fileUrl?.startsWith("http")) {
-      console.log("Using fileUrl (starts with http):", note.fileUrl);
       return note.fileUrl;
     }
     if (note.fileUrl) {
       const url = `${API_BASE}${note.fileUrl}`;
-      console.log("Using fileUrl with API_BASE:", url);
       return url;
     }
     if (note.filePath?.startsWith("http")) {
-      console.log("Using filePath (starts with http):", note.filePath);
       return note.filePath;
     }
     if (note.fileName) {
       const url = `${API_BASE}/uploads/bookmarks/${note.fileName}`;
-      console.log("Using fileName with API_BASE:", url);
       return url;
     }
-    console.log("No valid URL found");
     return "";
   };
   
@@ -66,10 +57,7 @@ const Bookmarks = () => {
     setError(null);
 
     try {
-      console.log("Fetching bookmarks from MongoDB");
       const response = await getBookmarks();
-      
-      console.log("FETCH BOOKMARKS RESPONSE:", response);
       
       // Normalize response keys - backend returns { success: true, data: [...], count: n }
       const fetchedNotes =
@@ -79,12 +67,8 @@ const Bookmarks = () => {
         response.note ||
         [];
       
-      console.log("PARSED BOOKMARKS:", fetchedNotes);
-      console.log("Number of bookmarks:", fetchedNotes.length);
-      
       setBookmarks(Array.isArray(fetchedNotes) ? fetchedNotes : [fetchedNotes]);
     } catch (err) {
-      console.error('Error loading bookmarks from MongoDB:', err);
       setError('Failed to load bookmarks');
       setBookmarks([]);
     } finally {
@@ -95,7 +79,6 @@ const Bookmarks = () => {
   // Load bookmarks on mount - only once when authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("Loading bookmarks on mount - isAuthenticated:", isAuthenticated);
       loadBookmarks();
     }
   }, [isAuthenticated, loadBookmarks]);
@@ -132,32 +115,26 @@ const Bookmarks = () => {
   }, [bookmarks, searchQuery, fileTypeFilter, sortBy]);
 
   const handleUploadSuccess = (uploadedNote) => {
-    console.log("UPLOAD SUCCESS CALLBACK CALLED WITH:", uploadedNote);
-    
     // Close modal and refetch bookmarks from backend to ensure data persistence
     setIsUploadModalOpen(false);
-    toast.success('Note uploaded successfully to MongoDB');
+    toast.success('Note uploaded successfully');
     
-    // Refetch bookmarks from MongoDB
+    // Refetch bookmarks from backend
     loadBookmarks();
   };
 
   const handleViewNote = (bookmark) => {
-    console.log("Viewing bookmark:", bookmark);
     setSelectedBookmark(bookmark);
     setIsPDFViewerOpen(true);
   };
 
   const handleDownload = (bookmark) => {
-    console.log("Downloading bookmark:", bookmark);
-    
     if (!bookmark.fileName) {
       toast.error('File information missing');
       return;
     }
 
     const fileUrl = `http://localhost:5000/uploads/bookmarks/${bookmark.fileName}`;
-    console.log("Download URL:", fileUrl);
     
     try {
       // Create download link
@@ -169,7 +146,6 @@ const Bookmarks = () => {
       document.body.removeChild(link);
       toast.success('Download started');
     } catch (error) {
-      console.error('Download error:', error);
       toast.error('Failed to download file');
     }
   };

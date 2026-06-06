@@ -10,14 +10,11 @@ export const useProgress = () => {
   const fetchProgress = async () => {
     try {
       setLoading(true);
-      console.log('Fetching progress from MongoDB');
       const response = await getProgress();
-      console.log('Progress data from MongoDB:', response);
       if (response.success) {
         setProgress(response.data);
       }
     } catch (error) {
-      console.error('Error fetching progress from MongoDB:', error);
       setError(error.message);
       toast.error('Failed to fetch progress from MongoDB');
       setProgress(null);

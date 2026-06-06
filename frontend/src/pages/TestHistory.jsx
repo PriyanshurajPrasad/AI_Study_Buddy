@@ -25,14 +25,11 @@ const TestHistory = () => {
     try {
       setLoading(true);
       const res = await api.get('/progress/history');
-      console.log('Test History API response:', res.data);
       
       if (res.data.success && res.data.results) {
         setTestHistory(res.data.results);
-        console.log('Test history loaded:', res.data.results.length);
       }
     } catch (error) {
-      console.error('Error loading test history:', error);
       toast.error('Failed to load test history');
       setTestHistory([]);
     } finally {
@@ -45,7 +42,6 @@ const TestHistory = () => {
     if (resultId) {
       navigate(`/quiz-result/${resultId}`);
     } else {
-      console.error('Quiz result missing ID:', result);
       toast.error('Invalid quiz result');
     }
   };

@@ -97,7 +97,7 @@ const BookmarkCard = ({ bookmark, onView, onDelete, onDownload }) => {
         toast.success('Note deleted successfully');
         if (onDelete) onDelete();
       } catch (error) {
-        console.error('Delete error:', error);
+        toast.error('Failed to delete note. Please try again.');
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
         } else if (error.message.includes('ERR_CONNECTION_REFUSED') || error.code === 'ECONNREFUSED') {
@@ -116,18 +116,14 @@ const BookmarkCard = ({ bookmark, onView, onDelete, onDownload }) => {
     e.stopPropagation();
     
     if (!bookmark.fileName) {
-      console.error('Missing fileName in bookmark:', bookmark);
       toast.error('File information missing');
       return;
     }
-
-    console.log("Opening bookmark:", bookmark);
     
     // Call parent's onView handler (which opens PDF viewer modal)
     if (onView) {
       onView(bookmark);
     } else {
-      console.error('onView handler not provided');
       toast.error('Preview not available');
     }
   };
@@ -137,18 +133,14 @@ const BookmarkCard = ({ bookmark, onView, onDelete, onDownload }) => {
     e.stopPropagation();
     
     if (!bookmark.fileName) {
-      console.error('Missing fileName in bookmark:', bookmark);
       toast.error('File information missing');
       return;
     }
-
-    console.log("Downloading bookmark:", bookmark);
     
     // Call parent's download handler
     if (onDownload) {
       onDownload(bookmark);
     } else {
-      console.error('onDownload handler not provided');
       toast.error('Download not available');
     }
   };

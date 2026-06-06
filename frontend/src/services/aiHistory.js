@@ -7,12 +7,9 @@ import api from './axios';
  */
 export const saveAIHistory = async (data) => {
   try {
-    console.log('Saving AI history to MongoDB for user:', data);
     const response = await api.post('/ai-history', data);
-    console.log('AI history saved successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error saving AI history to MongoDB:', error);
     throw error;
   }
 };
@@ -24,12 +21,9 @@ export const saveAIHistory = async (data) => {
  */
 export const getAIHistory = async (params = {}) => {
   try {
-    console.log('Fetching AI history from MongoDB with params:', params);
     const response = await api.get('/ai-history', { params });
-    console.log('AI history fetched successfully:', response.data.count, 'entries');
     return response.data;
   } catch (error) {
-    console.error('Error fetching AI history from MongoDB:', error);
     throw error;
   }
 };
@@ -41,12 +35,9 @@ export const getAIHistory = async (params = {}) => {
  */
 export const deleteAIHistory = async (id) => {
   try {
-    console.log('Deleting AI history entry:', id);
     const response = await api.delete(`/ai-history/${id}`);
-    console.log('AI history entry deleted successfully');
     return response.data;
   } catch (error) {
-    console.error('Error deleting AI history:', error);
     throw error;
   }
 };
@@ -57,12 +48,9 @@ export const deleteAIHistory = async (id) => {
  */
 export const clearAIHistory = async () => {
   try {
-    console.log('Clearing all AI history for current user');
     const response = await api.delete('/ai-history');
-    console.log('AI history cleared successfully');
     return response.data;
   } catch (error) {
-    console.error('Error clearing AI history:', error);
     throw error;
   }
 };

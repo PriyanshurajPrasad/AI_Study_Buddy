@@ -53,12 +53,9 @@ const AIAssistant = () => {
   const loadHistory = async () => {
     try {
       setLoadingHistory(true);
-      console.log('Loading AI history from MongoDB on mount');
       const result = await getAIHistory({ limit: 20 });
-      console.log('AI history loaded from MongoDB:', result.data?.length, 'entries');
       setAIHistory(result.data || []);
     } catch (error) {
-      console.error('Error loading history from MongoDB:', error);
       setAIHistory([]);
     } finally {
       setLoadingHistory(false);
@@ -93,7 +90,6 @@ const AIAssistant = () => {
 
   // Helper to get history response with multiple field fallbacks
   const getHistoryResponse = (item) => {
-    console.log("Getting response for history item:", item);
     return (
       item.response ||
       item.answer ||
@@ -130,11 +126,9 @@ const AIAssistant = () => {
 
   // Load history item when clicked
   const loadHistoryItem = (item) => {
-    console.log("Clicked history item:", item);
     const savedResponse = getHistoryResponse(item);
 
     if (!savedResponse) {
-      console.error("History item missing response:", item);
       toast.error("This history item has no saved response. Please regenerate it.");
       return;
     }
@@ -187,7 +181,6 @@ const AIAssistant = () => {
         toast.success('History deleted');
       }
     } catch (error) {
-      console.error('Error deleting history:', error);
       // Show specific error message from backend if available
       const errorMessage = error.response?.data?.message || 'Failed to delete history';
       toast.error(errorMessage);
@@ -260,7 +253,6 @@ const AIAssistant = () => {
       }
     } catch (error) {
       toast.error('AI service failed. Please check backend API key.');
-      console.error('Explanation error:', error);
     } finally {
       setLoadingExplanation(false);
     }
@@ -299,7 +291,6 @@ const AIAssistant = () => {
       }
     } catch (error) {
       toast.error('AI service failed. Please check backend API key.');
-      console.error('Answer error:', error);
     } finally {
       setLoadingAnswer(false);
     }
@@ -365,7 +356,6 @@ const AIAssistant = () => {
     };
     
     utterance.onerror = (error) => {
-      console.error('Speech synthesis error:', error);
       setIsSpeaking(false);
       toast.error('Failed to speak text');
     };

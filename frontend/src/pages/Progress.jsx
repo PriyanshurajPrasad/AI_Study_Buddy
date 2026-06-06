@@ -23,7 +23,6 @@ const Progress = () => {
     if (resultId) {
       navigate(`/quiz-result/${resultId}`);
     } else {
-      console.error('Quiz result missing ID:', result);
       toast.error('Invalid quiz result');
     }
   };
@@ -32,23 +31,16 @@ const Progress = () => {
   const loadProgress = async () => {
     try {
       setLoading(true);
-      console.log('Loading progress from MongoDB');
       
       const backendResponse = await getProgress();
-      console.log('Progress API response:', backendResponse);
       
       if (backendResponse.success && backendResponse.stats) {
         setProgress(backendResponse.stats);
-        console.log('Progress loaded successfully from MongoDB');
-        console.log('   Stats keys:', Object.keys(backendResponse.stats));
-        console.log('   Recent Results count:', backendResponse.stats.recentResults?.length || 0);
       } else {
         // Backend returned empty data
-        console.log('No progress data found in MongoDB, showing empty stats');
         setProgress(getEmptyStats());
       }
     } catch (error) {
-      console.error("Error loading progress from MongoDB:", error);
       setProgress(getEmptyStats());
     } finally {
       setLoading(false);

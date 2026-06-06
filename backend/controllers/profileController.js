@@ -8,12 +8,12 @@ const getProfileAnalytics = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    console.log("PROFILE ANALYTICS - User ID:", userId);
-
     // Fetch all quiz results for this user
     const results = await QuizResult.find({ userId }).sort({ createdAt: -1 });
 
-    console.log("Profile analytics results:", results.length);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Profile analytics fetched successfully');
+    }
 
     // Initialize default analytics structure
     const analytics = {
@@ -88,8 +88,6 @@ const getProfileAnalytics = async (req, res) => {
       .slice(0, 4);
 
     analytics.quizPerformance = topicPerformance;
-
-    console.log("Profile analytics calculated:", analytics);
 
     return res.status(200).json({
       success: true,

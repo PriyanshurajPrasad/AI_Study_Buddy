@@ -65,7 +65,6 @@ const Login = () => {
       }
     } catch (error) {
       // Error is handled by axios interceptor with specific messages
-      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }

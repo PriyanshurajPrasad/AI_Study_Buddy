@@ -45,7 +45,6 @@ const QuizResultDetail = () => {
         const localResult = JSON.parse(localStorage.getItem('currentQuizResult') || 'null');
         if (localResult) {
           setResult(localResult);
-          console.log("Quiz result detail data (local):", localResult);
         } else {
           setError('No local quiz result found');
         }
@@ -63,26 +62,22 @@ const QuizResultDetail = () => {
           
           if (data.success && data.result) {
             setResult(data.result);
-            console.log("Quiz result detail data:", data.result);
           } else {
             throw new Error('Result not found in backend');
           }
         } catch (backendError) {
-          console.warn('Backend fetch failed, trying localStorage:', backendError);
           // Fallback to localStorage
           const localResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
           const foundResult = localResults.find(r => r._id === resultId || r.id === resultId);
           
           if (foundResult) {
             setResult(foundResult);
-            console.log("Quiz result detail data (localStorage):", foundResult);
           } else {
             setError('Quiz result not found');
           }
         }
       }
     } catch (err) {
-      console.error('Error loading quiz result:', err);
       setError('Failed to load quiz result');
     } finally {
       setLoading(false);

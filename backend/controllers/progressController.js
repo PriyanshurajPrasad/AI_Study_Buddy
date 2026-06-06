@@ -10,11 +10,6 @@ const saveQuizResult = async (req, res, next) => {
   try {
     const { quizId, subject, topic, score, totalQuestions, correctAnswers, wrongAnswers, percentage, answers } = req.body;
 
-    console.log('=== SAVING QUIZ RESULT TO MONGODB ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Quiz Data:', { quizId, subject, topic, score, totalQuestions, percentage });
-
     // Validate required fields
     if (!quizId || !subject || !topic || score === undefined || !totalQuestions) {
       return res.status(400).json({
@@ -37,12 +32,9 @@ const saveQuizResult = async (req, res, next) => {
       answers: answers || [],
     });
 
-    console.log('✅ Quiz Result saved successfully to MongoDB');
-    console.log('   Result ID:', quizResult._id);
-    console.log('   User ID:', quizResult.userId);
-    console.log('   Subject:', quizResult.subject);
-    console.log('   Topic:', quizResult.topic);
-    console.log('   Percentage:', quizResult.percentage + '%');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Quiz Result saved successfully');
+    }
 
     return res.status(201).json({
       success: true,
@@ -63,16 +55,12 @@ const getProgressStats = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    console.log('=== FETCHING PROGRESS STATS FROM MONGODB ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
 
-    console.log('✅ Quiz results fetched successfully from MongoDB');
-    console.log('   Total Results:', allResults.length);
-    console.log('   User ID:', userId);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Quiz results fetched successfully');
+    }
 
     if (allResults.length === 0) {
       return res.status(200).json({
@@ -293,8 +281,9 @@ const getTestHistory = async (req, res, next) => {
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
 
-    console.log('✅ Test history fetched successfully from MongoDB');
-    console.log('   Total Results:', allResults.length);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Test history fetched successfully');
+    }
 
     return res.status(200).json({
       success: true,
@@ -330,14 +319,12 @@ const getSubjectStatistics = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    console.log('=== FETCHING SUBJECT STATISTICS FROM MONGODB ===');
-    console.log('User ID:', req.user.id);
-
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
 
-    console.log('✅ Quiz results fetched successfully from MongoDB');
-    console.log('   Total Results:', allResults.length);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Subject statistics fetched successfully');
+    }
 
     if (allResults.length === 0) {
       return res.status(200).json({
@@ -429,9 +416,9 @@ const getSubjectStatistics = async (req, res, next) => {
       subjects: subjects
     };
 
-    console.log('✅ Subject statistics calculated successfully');
-    console.log('   Total Subjects:', stats.totalSubjects);
-    console.log('   Total Topics:', stats.totalTopics);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Subject statistics calculated successfully');
+    }
 
     return res.status(200).json({
       success: true,

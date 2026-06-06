@@ -21,9 +21,6 @@ const QuizAttempt = () => {
     const locationQuiz = location.state?.quiz;
     const finalQuiz = locationQuiz;
 
-    console.log("QUIZ ATTEMPT QUIZ:", finalQuiz);
-    console.log("QUIZ ID:", finalQuiz?._id || finalQuiz?.id);
-
     if (!finalQuiz) {
       setLoading(false);
       toast.error('No quiz data found');
@@ -32,14 +29,11 @@ const QuizAttempt = () => {
     }
 
     const questions = Array.isArray(finalQuiz.questions) ? finalQuiz.questions : [];
-    console.log("QUIZ ATTEMPT QUESTIONS:", questions);
-    console.log("QUESTIONS COUNT:", questions.length);
 
     if (questions.length > 0) {
       setQuiz(finalQuiz);
       setAnswers(new Array(questions.length).fill(null));
     } else {
-      console.error("No quiz questions found");
       toast.error('No quiz questions found');
     }
 
@@ -103,7 +97,6 @@ const QuizAttempt = () => {
       // Prepare result payload for backend
       const quizId = quiz._id || quiz.id;
       if (!quizId) {
-        console.error('Quiz ID is missing, cannot save to backend');
         toast.error('Quiz ID is missing, cannot save result');
         setSubmitting(false);
         return;
@@ -122,11 +115,8 @@ const QuizAttempt = () => {
         scorePercentage: Number(percentage) || 0
       };
 
-      console.log("FINAL SUBMIT PAYLOAD:", payload);
-
       // Submit quiz to backend
       const response = await submitQuiz(payload);
-      console.log('Quiz submission response:', response);
 
       // Navigate to result page
       if (response.success) {
@@ -135,12 +125,10 @@ const QuizAttempt = () => {
           state: { result: response.result }
         });
       } else {
-        console.error('Quiz submission failed:', response);
         toast.error('Failed to submit quiz');
         setSubmitted(true);
       }
     } catch (error) {
-      console.error('Quiz submission error:', error);
       toast.error('Failed to submit quiz');
     } finally {
       setSubmitting(false);

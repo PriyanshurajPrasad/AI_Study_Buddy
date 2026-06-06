@@ -12,12 +12,6 @@ const PDFViewerModal = ({ isOpen, onClose, fileUrl, fileName }) => {
   // Validate fileUrl on mount
   useEffect(() => {
     if (isOpen) {
-      console.log("=== PDF MODAL DEBUG ===");
-      console.log("PDF MODAL NOTE:", { fileName, fileUrl });
-      console.log("PDF FILE URL:", fileUrl);
-      console.log("FILE URL TYPE:", typeof fileUrl);
-      console.log("FILE URL STARTS WITH HTTP:", fileUrl?.startsWith("http"));
-      
       setLoading(true);
       setError("");
 
@@ -44,7 +38,6 @@ const PDFViewerModal = ({ isOpen, onClose, fileUrl, fileName }) => {
       document.body.removeChild(link);
       toast.success('Download started');
     } catch (error) {
-      console.error('Download error:', error);
       toast.error('Failed to download file');
     }
   };
@@ -62,13 +55,11 @@ const PDFViewerModal = ({ isOpen, onClose, fileUrl, fileName }) => {
   };
 
   const handleIframeLoad = () => {
-    console.log("Iframe loaded successfully");
     setLoading(false);
     setError(null);
   };
 
   const handleIframeError = () => {
-    console.error("Iframe failed to load");
     setLoading(false);
     setError("Unable to load PDF. Try opening in new tab.");
     toast.error("Failed to load PDF in viewer");

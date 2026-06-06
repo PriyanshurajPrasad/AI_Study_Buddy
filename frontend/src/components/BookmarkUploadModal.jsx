@@ -113,10 +113,6 @@ const BookmarkUploadModal = ({ isOpen, onClose, onSuccess }) => {
       const { uploadBookmark } = await import('../services/bookmark');
       const response = await uploadBookmark(data);
 
-      console.log("UPLOAD RESPONSE:", response);
-      console.log("UPLOAD RESPONSE NOTE:", response.note);
-      console.log("UPLOAD RESPONSE DATA:", response.data);
-
       if (response.success) {
         resetForm();
         onClose();
@@ -126,7 +122,6 @@ const BookmarkUploadModal = ({ isOpen, onClose, onSuccess }) => {
         toast.error(response.message || 'Failed to upload note');
       }
     } catch (error) {
-      console.error('Upload error:', error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else if (error.message.includes('ERR_CONNECTION_REFUSED') || error.code === 'ECONNREFUSED') {
