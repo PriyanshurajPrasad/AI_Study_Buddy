@@ -35,19 +35,12 @@ const saveAIHistory = async (req, res, next) => {
       tags: tags || []
     });
 
-    console.log('✅ AI History saved successfully to MongoDB');
-    console.log('   History ID:', historyEntry._id);
-    console.log('   User ID:', historyEntry.userId);
-    console.log('   Type:', historyEntry.type);
-    console.log('   Topic:', historyEntry.topic);
-
     return res.status(201).json({
       success: true,
       message: 'History saved successfully',
       data: historyEntry
     });
   } catch (error) {
-    console.error('Error saving AI history:', error);
     next(error);
   }
 };
@@ -59,11 +52,6 @@ const saveAIHistory = async (req, res, next) => {
 const getAIHistory = async (req, res, next) => {
   try {
     const { type, search, limit = 50 } = req.query;
-
-    console.log('=== FETCHING AI HISTORY FROM MONGODB ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Filters:', { type, search, limit });
 
     // Build query
     const query = { userId: req.user.id };
@@ -87,17 +75,12 @@ const getAIHistory = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
 
-    console.log('✅ AI History fetched successfully from MongoDB');
-    console.log('   Count:', history.length);
-    console.log('   User ID:', req.user.id);
-
     return res.status(200).json({
       success: true,
       data: history,
       count: history.length
     });
   } catch (error) {
-    console.error('Error fetching AI history:', error);
     next(error);
   }
 };
@@ -131,14 +114,11 @@ const deleteAIHistory = async (req, res, next) => {
       });
     }
 
-    console.log('AI History deleted:', id);
-
     return res.status(200).json({
       success: true,
       message: 'History entry deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting AI history:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to delete history item'
@@ -154,15 +134,12 @@ const clearAIHistory = async (req, res, next) => {
   try {
     const result = await AIHistory.deleteMany({ userId: req.user.id });
 
-    console.log('Cleared AI history for user:', req.user.id, 'Deleted:', result.deletedCount);
-
     return res.status(200).json({
       success: true,
       message: `Successfully cleared ${result.deletedCount} history entries`,
       deletedCount: result.deletedCount
     });
   } catch (error) {
-    console.error('Error clearing AI history:', error);
     next(error);
   }
 };

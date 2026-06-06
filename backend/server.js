@@ -69,8 +69,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-console.log('Static files served from:', path.join(__dirname, 'uploads'));
-
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));

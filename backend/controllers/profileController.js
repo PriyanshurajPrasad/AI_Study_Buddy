@@ -11,10 +11,6 @@ const getProfileAnalytics = async (req, res) => {
     // Fetch all quiz results for this user
     const results = await QuizResult.find({ userId }).sort({ createdAt: -1 });
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Profile analytics fetched successfully');
-    }
-
     // Initialize default analytics structure
     const analytics = {
       weeklyPerformance: [
@@ -31,7 +27,6 @@ const getProfileAnalytics = async (req, res) => {
     };
 
     if (results.length === 0) {
-      console.log("No quiz results found, returning empty analytics");
       return res.status(200).json({
         success: true,
         analytics
@@ -94,7 +89,6 @@ const getProfileAnalytics = async (req, res) => {
       analytics
     });
   } catch (error) {
-    console.error("Error fetching profile analytics:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch profile analytics"

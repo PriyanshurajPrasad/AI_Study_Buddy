@@ -32,17 +32,12 @@ const saveQuizResult = async (req, res, next) => {
       answers: answers || [],
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Quiz Result saved successfully');
-    }
-
     return res.status(201).json({
       success: true,
       message: 'Quiz result saved successfully',
       result: quizResult
     });
   } catch (error) {
-    console.error('Error saving quiz result:', error);
     next(error);
   }
 };
@@ -57,10 +52,6 @@ const getProgressStats = async (req, res, next) => {
 
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Quiz results fetched successfully');
-    }
 
     if (allResults.length === 0) {
       return res.status(200).json({
@@ -133,7 +124,6 @@ const getProgressStats = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error getting progress stats:', error);
     next(error);
   }
 };
@@ -275,22 +265,14 @@ const getTestHistory = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    console.log('=== FETCHING TEST HISTORY FROM MONGODB ===');
-    console.log('User ID:', req.user.id);
-
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Test history fetched successfully');
-    }
 
     return res.status(200).json({
       success: true,
       results: allResults
     });
   } catch (error) {
-    console.error('Error fetching test history:', error);
     next(error);
   }
 };
@@ -321,10 +303,6 @@ const getSubjectStatistics = async (req, res, next) => {
 
     // Get all quiz results for this user
     const allResults = await QuizResult.find({ userId }).sort({ createdAt: -1 });
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Subject statistics fetched successfully');
-    }
 
     if (allResults.length === 0) {
       return res.status(200).json({
@@ -416,16 +394,11 @@ const getSubjectStatistics = async (req, res, next) => {
       subjects: subjects
     };
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Subject statistics calculated successfully');
-    }
-
     return res.status(200).json({
       success: true,
       stats: stats
     });
   } catch (error) {
-    console.error('Error fetching subject statistics:', error);
     next(error);
   }
 };

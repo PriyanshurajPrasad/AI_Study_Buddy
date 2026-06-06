@@ -25,8 +25,6 @@ const summarizeNotes = async (req, res) => {
       });
     }
 
-    console.log('AI Summary Request:', { noteId, userId: req.user?.id });
-
     const summary = await generateSummary(note.extractedText);
 
     // Update note with summary
@@ -41,7 +39,6 @@ const summarizeNotes = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Controller error in summarizeNotes:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again later.',
@@ -71,8 +68,6 @@ const explainConcept = async (req, res) => {
       });
     }
 
-    console.log('AI Explanation Request:', { contentToExplain, language: selectedLanguage, userId: req.user?.id });
-
     const explanation = await generateExplanation(contentToExplain, selectedLanguage);
 
     res.status(200).json({
@@ -83,13 +78,6 @@ const explainConcept = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Controller error in explainConcept:', error);
-    console.error('Full error details:', {
-      message: error.message,
-      stack: error.stack,
-      response: error.response?.data
-    });
-
     // In development, return 200 with fallback message to avoid frontend crash
     if (process.env.NODE_ENV === 'development') {
       res.status(200).json({
@@ -134,8 +122,6 @@ const generateQuizFromNotes = async (req, res) => {
       });
     }
 
-    console.log('AI Quiz Generation Request:', { noteId, userId: req.user?.id });
-
     const quiz = await generateQuiz(note.extractedText);
 
     res.status(200).json({
@@ -146,7 +132,6 @@ const generateQuizFromNotes = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Controller error in generateQuizFromNotes:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again later.',
@@ -179,8 +164,6 @@ const generateVivaQuestions = async (req, res) => {
       });
     }
 
-    console.log('AI Viva Generation Request:', { noteId, userId: req.user?.id });
-
     const vivaQuestions = await generateViva(note.extractedText);
 
     res.status(200).json({
@@ -191,7 +174,6 @@ const generateVivaQuestions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Controller error in generateVivaQuestions:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again later.',
@@ -216,8 +198,6 @@ const askDoubt = async (req, res) => {
       });
     }
 
-    console.log('AI Question Request:', { question, userId: req.user?.id });
-
     const answer = await askQuestion(question);
 
     res.status(200).json({
@@ -228,7 +208,6 @@ const askDoubt = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Controller error in askDoubt:', error);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again later.',

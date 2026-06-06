@@ -67,7 +67,6 @@ const uploadBookmark = async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error('Error uploading bookmark:', error.message);
     next(error);
   }
 };
@@ -107,10 +106,6 @@ const getBookmarks = async (req, res, next) => {
       ...bookmark.toObject(),
       fileUrl: `${req.protocol}://${req.get('host')}/uploads/bookmarks/${bookmark.fileName}`
     }));
-
-    console.log('✅ Bookmarks fetched successfully from MongoDB');
-    console.log('   Count:', bookmarksWithUrls.length);
-    console.log('   User ID:', req.user.id);
 
     return res.status(200).json({
       success: true,
