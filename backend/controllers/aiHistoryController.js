@@ -9,14 +9,6 @@ const saveAIHistory = async (req, res, next) => {
   try {
     const { type, query, response, topic, tags } = req.body;
 
-    console.log('=== SAVING AI HISTORY TO MONGODB ===');
-    console.log('User ID:', req.user.id);
-    console.log('User Email:', req.user.email);
-    console.log('Type:', type);
-    console.log('Topic:', topic);
-    console.log('Query Length:', query?.length || 0);
-    console.log('Response Length:', response?.length || 0);
-
     // Validate required fields
     if (!type || !query || !response) {
       return res.status(400).json({
