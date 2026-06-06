@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+
+# Uploads
+uploads/*.pdf
+uploads/*.txt
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+dist/
+build/
+
+node_modules/
+.env
+dist/
+build/
+uploads/
+NUL
+nul
+*.log

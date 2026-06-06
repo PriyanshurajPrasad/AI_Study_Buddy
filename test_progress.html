@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Progress Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .stats {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Progress Tracking</h1>
+        <p>This page tests the live progress tracking system.</p>
+        
+        <button onclick="addTestResult()">Add Test Quiz Result (20% score)</button>
+        <button onclick="addAnotherResult()">Add Another Result (80% score)</button>
+        <button onclick="clearResults()">Clear All Results</button>
+        <button onclick="showCurrentStats()">Show Current Stats</button>
+
+        <div class="stats">
+            <h3>📊 Current Statistics</h3>
+            <div id="statsDisplay"></div>
+        </div>
+
+        <div class="stats">
+            <h3>📝 Recent Results</h3>
+            <pre id="resultsDisplay"></pre>
+        </div>
+    </div>
+
+    <script>
+        function addTestResult() {
+            const result = {
+                id: Date.now().toString(),
+                quizId: "test-quiz-" + Date.now(),
+                subject: "Physics",
+                topic: "Newton's Laws",
+                title: "Newton's Laws Quiz",
+                score: 2,
+                totalQuestions: 10,
+                correctAnswers: 2,
+                wrongAnswers: 8,
+                percentage: 20,
+                completedAt: new Date().toISOString(),
+                answers: ["A", "B", "C", "D", "A", "B", "C", "D", "A", "B"]
+            };
+
+            saveResult(result);
+            alert("Added test result with 20% score!");
+            showCurrentStats();
+        }
+
+        function addAnotherResult() {
+            const result = {
+                id: Date.now().toString(),
+                quizId: "test-quiz-" + Date.now(),
+                subject: "Chemistry",
+                topic: "Hydrocarbons",
+                title: "Hydrocarbons Quiz",
+                score: 8,
+                totalQuestions: 10,
+                correctAnswers: 8,
+                wrongAnswers: 2,
+                percentage: 80,
+                completedAt: new Date().toISOString(),
+                answers: ["A", "B", "C", "D", "A", "B", "C", "D", "A", "B"]
+            };
+
+            saveResult(result);
+            alert("Added test result with 80% score!");
+            showCurrentStats();
+        }
+
+        function saveResult(result) {
+            const oldResults = JSON.parse(localStorage.getItem("quizResults") || "[]");
+            const updatedResults = [result, ...oldResults];
+            localStorage.setItem("quizResults", JSON.stringify(updatedResults));
+            
+            // Dispatch event for live update
+            window.dispatchEvent(new Event("quizResultSaved"));
+        }
+
+        function clearResults() {
+            localStorage.removeItem("quizResults");
+            alert("Cleared all results!");
+            showCurrentStats();
+        }
+
+        function showCurrentStats() {
+            const results = JSON.parse(localStorage.getItem("quizResults") || "[]");
+            
+            const totalQuizzes = results.length;
+            const totalQuestions = results.reduce((sum, r) => sum + Number(r.totalQuestions || 0), 0);
+            const totalCorrect = results.reduce((sum, r) => sum + Number(r.correctAnswers || 0), 0);
+            const averageScore = totalQuestions > 0
+                ? Math.round((totalCorrect / totalQuestions) * 100)
+                : 0;
+            const completedTopics = [...new Set(results.map(r => r.topic).filter(Boolean))];
+
+            const statsHTML = `
+                <p><strong>Total Quizzes:</strong> ${totalQuizzes}</p>
+                <p><strong>Total Questions:</strong> ${totalQuestions}</p>
+                <p><strong>Total Correct:</strong> ${totalCorrect}</p>
+                <p><strong>Average Score:</strong> ${averageScore}%</p>
+                <p><strong>Completed Topics:</strong> ${completedTopics.join(", ") || "None"}</p>
+            `;
+
+            document.getElementById("statsDisplay").innerHTML = statsHTML;
+            document.getElementById("resultsDisplay").textContent = JSON.stringify(results, null, 2);
+        }
+
+        // Listen for custom events
+        window.addEventListener("quizResultSaved", () => {
+            console.log("Quiz result saved event received!");
+            showCurrentStats();
+        });
+
+        // Show initial stats
+        showCurrentStats();
+    </script>
+</body>
+</html>
