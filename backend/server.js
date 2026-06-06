@@ -39,7 +39,9 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://localhost:5175",
   "http://localhost:5176",
-  "http://localhost:5177"
+  "http://localhost:5177",
+  "https://ai-study-buddy-git-main-priyanshurajs-projects.vercel.app",
+  "https://ai-study-buddy-8mm5xz9u-priyanshurajs-projects.vercel.app"
 ];
 
 app.use(cors({
