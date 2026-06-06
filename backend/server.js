@@ -28,48 +28,39 @@ connectDB().then(() => {
 // Middleware
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:3001", 
-  "http://localhost:3002",
-  "http://localhost:3003",
-  "http://localhost:3004",
-  "http://localhost:3005",
-  "http://localhost:3006",
-  "http://localhost:3007",
+  "http://localhost:3001",
   "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "http://localhost:5176",
-  "http://localhost:5177",
+  process.env.CLIENT_URL,
   "https://ai-study-buddy-git-main-priyanshurajs-projects.vercel.app",
   "https://ai-study-buddy-8mm5xz9u-priyanshurajs-projects.vercel.app"
-];
+].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) {
+    if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // Block disallowed origins
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
-}));
+};
 
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Log CORS configuration for debugging
+console.log('🌍 CORS Configuration:');
+console.log('   CLIENT_URL:', process.env.CLIENT_URL || 'Not set');
+console.log('   Allowed Origins:', allowedOrigins);
+console.log('   Credentials:', corsOptions.credentials);
+console.log('   Methods:', corsOptions.methods.join(', '));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
