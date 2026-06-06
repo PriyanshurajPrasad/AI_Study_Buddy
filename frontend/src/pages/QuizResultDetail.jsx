@@ -51,17 +51,11 @@ const QuizResultDetail = () => {
       } else {
         // Try to fetch from backend first
         try {
-          const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/quiz/results/${resultId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          const data = await response.json();
+          const api = (await import('../services/axios')).default;
+          const response = await api.get(`/quiz/results/${resultId}`);
           
-          if (data.success && data.result) {
-            setResult(data.result);
+          if (response.data.success && response.data.result) {
+            setResult(response.data.result);
           } else {
             throw new Error('Result not found in backend');
           }

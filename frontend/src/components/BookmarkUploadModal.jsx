@@ -124,8 +124,8 @@ const BookmarkUploadModal = ({ isOpen, onClose, onSuccess }) => {
     } catch (error) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
-      } else if (error.message.includes('ERR_CONNECTION_REFUSED') || error.code === 'ECONNREFUSED') {
-        toast.error('Backend server is not running. Please start backend.');
+      } else if (error.message) {
+        toast.error(`Upload failed: ${error.message}`);
       } else {
         toast.error('Failed to upload note');
       }

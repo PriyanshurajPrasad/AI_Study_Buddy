@@ -20,7 +20,11 @@ const Bookmarks = () => {
 
   // Helper function to safely construct PDF URL
   const getPdfUrl = (note) => {
-    const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
+    const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "");
+    
+    if (!API_BASE) {
+      return "";
+    }
     
     if (note.fileUrl?.startsWith("http")) {
       return note.fileUrl;
@@ -134,7 +138,13 @@ const Bookmarks = () => {
       return;
     }
 
-    const fileUrl = `http://localhost:5000/uploads/bookmarks/${bookmark.fileName}`;
+    const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "");
+    if (!API_BASE) {
+      toast.error('API base URL not configured');
+      return;
+    }
+    
+    const fileUrl = `${API_BASE}/uploads/bookmarks/${bookmark.fileName}`;
     
     try {
       // Create download link

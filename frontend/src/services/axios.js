@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: false,
 });
 
 // Request interceptor to add token
@@ -57,9 +58,9 @@ api.interceptors.response.use(
           toast.error(data.message || 'An error occurred');
       }
     } else if (error.request) {
-      // Network error - check if it's connection refused
-      if (error.code === 'ECONNREFUSED' || error.message.includes('ERR_CONNECTION_REFUSED') || error.message.includes('Network Error')) {
-        toast.error('Backend server is not running. Please start backend first.');
+      // Network error - show actual error message
+      if (error.message) {
+        toast.error(`Network error: ${error.message}`);
       } else {
         toast.error('Network error. Please check your connection.');
       }

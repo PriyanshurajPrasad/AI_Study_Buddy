@@ -97,13 +97,12 @@ const BookmarkCard = ({ bookmark, onView, onDelete, onDownload }) => {
         toast.success('Note deleted successfully');
         if (onDelete) onDelete();
       } catch (error) {
-        toast.error('Failed to delete note. Please try again.');
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
-        } else if (error.message.includes('ERR_CONNECTION_REFUSED') || error.code === 'ECONNREFUSED') {
-          toast.error('Backend server is not running. Please start backend.');
+        } else if (error.message) {
+          toast.error(`Delete failed: ${error.message}`);
         } else {
-          toast.error('Failed to delete note');
+          toast.error('Failed to delete note. Please try again.');
         }
       } finally {
         setDeleting(false);
