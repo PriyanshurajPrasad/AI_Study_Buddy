@@ -30,21 +30,28 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:5173",
-  process.env.CLIENT_URL,
-  "https://ai-study-buddy-git-main-priyanshurajs-projects.vercel.app",
-  "https://ai-study-buddy-8mm5xz9u-priyanshurajs-projects.vercel.app"
+  "https://ai-study-buddy-one-mu.vercel.app",
+  process.env.CLIENT_URL
 ].filter(Boolean);
 
 const corsOptions = {
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+
+    const isAllowed =
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app");
+
+    if (isAllowed) {
       return callback(null, true);
     }
-    return callback(new Error("Not allowed by CORS"));
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
